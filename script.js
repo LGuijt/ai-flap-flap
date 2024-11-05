@@ -39,11 +39,11 @@ function loadBirdSpriteImages() {
 }
 
 
+
 fetch('colors.json')
   .then(response => response.json())
   .then(data => {
     colors = data.colors;
-    console.log(colors); // Array of colors
     createColorButtons(); // Call to create color buttons
   })
   .catch(error => console.error('Error loading the colors:', error));
@@ -62,6 +62,7 @@ function createColorButtons() {
   });
 }
 
+
 // Game variables
 let birdY;
 let birdVelocity = 0;
@@ -77,14 +78,28 @@ let pipeSpeed = 2; // Initial pipe speed
 
 // Pipe settings
 const pipeWidth = 60;
-
 const pipeGap = 250;  // Gap between top and bottom pipes
 const pipeSpacing = 300;  // Space between pipes
-
 const pipes = [];
 
 // Bird settings
+
 const birdSize = 40;
+
+// Initialize bird position and other game settings
+function initGame() {
+    birdY = canvas.height / 2; // Reset bird's Y position
+    birdVelocity = 0; // Reset bird's velocity
+    score = 0; // Reset score
+    pipeSpeed = 2; // Reset pipe speed
+    isGameOver = false; // Reset game over state
+    pipes.length = 0; // Clear pipes
+}
+
+// Background music
+const backgroundMusic = new Audio('background.mp3'); // Update with the path to your downloaded audio file
+backgroundMusic.loop = true; // Loop the music continuously
+backgroundMusic.volume = 0.5; // Adjust volume (0.0 to 1.0)
 
 
 // Initialize bird position
@@ -93,25 +108,35 @@ function initBird() {
     birdVelocity = 0; // Reset velocity
     const randomIndex = Math.floor(Math.random() * 9);
     selectedBirdSprite = birdSprites[randomIndex];
+
+// Play the audio when the game starts
+function startBackgroundMusic() {
+  backgroundMusic.play();
+
 }
 
 
 // Draw bird with external image
 function drawBird() {
     const birdX = 50; // Fixed X position of the bird
+
     ctx.drawImage(selectedBirdSprite.image, birdX, birdY, birdSize, birdSize);
+
 
 }
 
 // Generate pipes
 function createPipe() {
-    const pipeHeight = Math.floor(Math.random() * (canvas.height - pipeGap - 100) + 50); // Added range
+    const pipeHeight = Math.floor(Math.random() * (canvas.height - pipeGap - 100) + 50); // Random height
     pipes.push({
         x: canvas.width,
         topPipe: pipeHeight,
-        bottomPipe: pipeHeight + pipeGap
+        bottomPipe: pipeHeight + pipeGap,
+        scored: false // Track if the pipe has been scored
     });
 }
+
+
 
 // Draw pipes with border and top part
 function drawPipes() {
@@ -149,14 +174,19 @@ function drawPipes() {
       ctx.fillStyle = "gray"; // Use selected color
     } else {
     ctx.fillStyle = selectedPipeColor; // Use selected color for inner pipe
+
     }
+
     ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topPipe);
     ctx.fillRect(pipe.x, pipe.bottomPipe, pipeWidth, canvas.height - pipe.bottomPipe);
 }
+
   )
 }
 
+
 // Update pipes
+
 function updatePipes() {
     if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - pipeSpacing) {
         createPipe();
@@ -171,7 +201,7 @@ function updatePipes() {
             50 + birdSize > pipe.x &&
             (birdY < pipe.topPipe || birdY + birdSize > pipe.bottomPipe)
         ) {
-            isGameOver = true;
+            isGameOver = true; // Game over if there is a collision
         }
 
         // Score update
@@ -181,7 +211,7 @@ function updatePipes() {
 
             // Increase speed every 10 points
             if (score % 10 === 0) {
-                pipeSpeed += 0.1; // Increase speed slightly with every 10 points
+                pipeSpeed += 0.1; // Slightly increase speed
             }
 
             // Update high score
@@ -200,10 +230,7 @@ function updatePipes() {
 // Game mechanics
 function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-
-    // Draw background image
-    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // Draw background
 
     // Apply gravity and update bird position
     birdVelocity += gravity;
@@ -239,24 +266,16 @@ function showDeathScreen() {
     document.getElementById("death-screen").style.display = "flex";
     document.getElementById("gameCanvas").style.display = "none";
     document.getElementById("final-score").innerText = score; // Display final score
-
 }
 
 // Reset game
 function resetGame() {
-    initBird(); // Initialize bird position
-    score = 0;
-    pipes.length = 0;
-    isGameOver = false;
-    gameStarted = false;
-    pipeSpeed = 2; // Reset pipe speed to normal
-
+    initGame(); // Reset all game variables
     // Hide death screen and show game canvas
     document.getElementById("death-screen").style.display = "none";
     document.getElementById("gameCanvas").style.display = "block";
 
-
-    // Hide start screen and show game canvas
+    // Hide start screen if it's visible
     document.getElementById("start-screen").style.display = "none";
 
     updateGame(); // Start the game loop
@@ -264,9 +283,9 @@ function resetGame() {
 
 // Start game on play button press
 document.getElementById("play-button").addEventListener("click", () => {
+    initGame(); // Initialize game variables before starting
     document.getElementById("start-screen").style.display = "none";
     gameStarted = true;
-    initBird(); // Initialize bird position before starting the game
     updateGame();
 });
 
@@ -280,6 +299,7 @@ document.getElementById("home-button").addEventListener("click", () => {
 
 // Control the bird with spacebar
 document.addEventListener("keydown", (e) => {
+
     if (e.code === "Space") {
         if (gameStarted) {
             birdVelocity = jump; // Jump only if game is started
@@ -287,8 +307,12 @@ document.addEventListener("keydown", (e) => {
             // Start the game if it's not started yet
             document.getElementById("start-screen").style.display = "none";
             gameStarted = true;
+
+          startBackgroundMusic(); // Start background music
             initBird(); // Initialize bird position
+
             updateGame();
         }
+
     }
 });
