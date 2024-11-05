@@ -14,7 +14,7 @@ const backgroundImage = new Image();
 backgroundImage.src = 'Flappybirds.png'; // Replace with the path to your background image
 
 const birdImg = new Image();
-birdImg.src = "birb.png"; // Replace "bird.png" with the path to your bird image
+birdImg.src = "nyancatrainbowbutt.png"; // Replace "bird.png" with the path to your bird image
 
 // Game variables
 let birdY;
@@ -36,13 +36,14 @@ const pipeSpacing = 300;  // Space between pipes
 const pipes = [];
 
 // Bird settings
-const birdSize = 20;
+const birdSize = 40;
 
 // Initialize bird position
 function initBird() {
     birdY = canvas.height / 2; // Mid-air position
     birdVelocity = 0; // Reset velocity
 }
+
 
 // Draw bird with external image
 function drawBird() {
@@ -60,14 +61,47 @@ function createPipe() {
     });
 }
 
-// Draw pipes
+
+  // Draw pipes with border and top part
 function drawPipes() {
-    ctx.fillStyle = "green";
-    pipes.forEach(pipe => {
-        ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topPipe);
-        ctx.fillRect(pipe.x, pipe.bottomPipe, pipeWidth, canvas.height - pipe.bottomPipe);
-    });
+
+  pipes.forEach(pipe => {
+    // Pipe colors
+    const pipeBodyColor = "#228B22"; // Forest green
+    const pipeTopColor = "#006400"; // Darker green for the top
+    const borderColor = "#003300"; // Darker green for the border
+
+    // Set pipe border thickness
+    const borderThickness = 4;
+
+    // Draw top part of the pipe
+    ctx.fillStyle = pipeTopColor;
+    ctx.fillRect(
+      pipe.x - borderThickness,   // Extend slightly for border effect
+      pipe.topPipe - 20,          // Give top pipe cap height
+      pipeWidth + 2 * borderThickness,  // Add width for border
+      20                          // Height of the top part
+    );
+
+    ctx.fillRect(
+      pipe.x - borderThickness,
+      pipe.bottomPipe,
+      pipeWidth + 2 * borderThickness,
+      20
+    );
+
+    // Draw pipe body with border
+    ctx.fillStyle = borderColor; // Border color for pipe
+    ctx.fillRect(pipe.x - borderThickness, 0, pipeWidth + 2 * borderThickness, pipe.topPipe);
+    ctx.fillRect(pipe.x - borderThickness, pipe.bottomPipe, pipeWidth + 2 * borderThickness, canvas.height - pipe.bottomPipe);
+
+    // Draw the inner pipe
+    ctx.fillStyle = pipeBodyColor;
+    ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topPipe);
+    ctx.fillRect(pipe.x, pipe.bottomPipe, pipeWidth, canvas.height - pipe.bottomPipe);
+  });
 }
+
 
 // Update pipes
 function updatePipes() {
@@ -165,6 +199,7 @@ function resetGame() {
     // Hide death screen and show game canvas
     document.getElementById("death-screen").style.display = "none";
     document.getElementById("gameCanvas").style.display = "block";
+
 
     // Hide start screen and show game canvas
     document.getElementById("start-screen").style.display = "none";
