@@ -20,7 +20,9 @@ birdImg.src = "birb.png"; // Replace "bird.png" with the path to your bird image
 let birdY = canvas.height / 2;
 let birdVelocity = 0;
 const gravity = 0.2;
-const jump = -5;
+
+const jump = -8;
+
 let score = 0;
 let highScore = 0;
 let level = 1;
@@ -30,11 +32,13 @@ let pipeSpeed = 2;
 
 // Pipe settings
 const pipeWidth = 60;
-const pipeGap = 150;
+const pipeGap = 250;  // Further increase gap between top and bottom pipes
+const pipeSpacing = 300;  // Space between pipes
 const pipes = [];
 
 // Bird settings
 const birdSize = 20;
+let ceilingHitCooldown = 0;  // Counter for staying on the ceiling
 
 // Draw bird with external image
 function drawBird() {
@@ -63,7 +67,7 @@ function drawPipes() {
 
 // Update pipes
 function updatePipes() {
-  if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
+  if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - pipeSpacing) {
     createPipe();
   }
 
@@ -112,13 +116,21 @@ function updateGame() {
   // Draw background image
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-  // Apply gravity and update bird position
-  birdVelocity += gravity;
-  birdY += birdVelocity;
+  // Apply gravity and update bird position if it's not glued to the ceiling
+  if (ceilingHitCooldown > 0) {
+    ceilingHitCooldown--;
+  } else {
+    birdVelocity += gravity;
+    birdY += birdVelocity;
+  }
 
   // Prevent bird from going off the canvas
-  if (birdY > canvas.height - birdSize || birdY < 0) {
-    isGameOver = true;
+  if (birdY > canvas.height - birdSize) {
+    isGameOver = true;  // Game over if bird touches the bottom
+  } else if (birdY < 0) {
+    birdY = 0;               // Stop the bird at the top
+    birdVelocity = 0;        // Reset upward velocity
+    ceilingHitCooldown = 20; // Stay on the ceiling for a bit before falling
   }
 
   drawBird();
@@ -149,7 +161,10 @@ function resetGame() {
   isGameOver = false;
   gameStarted = false;
   pipeSpeed = 2;
-}
+
+  ceilingHitCooldown = 0;
+  document.getElementById("score").textContent = score;
+
 
 // Start game on space bar press
 document.addEventListener("keydown", (e) => {
