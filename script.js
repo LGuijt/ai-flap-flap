@@ -2,6 +2,8 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 let colors = [];
 let selectedPipeColor = "#228B22"; // Default pipe color
+let selectedBirdSprite;
+const randomIndex = Math.floor(Math.random() * 9);
 
 // Set canvas to full screen size
 function resizeCanvas() {
@@ -15,8 +17,27 @@ window.addEventListener("resize", resizeCanvas);
 const backgroundImage = new Image();
 backgroundImage.src = 'Flappybirds.png';
 
-const birdImg = new Image();
-birdImg.src = "nyancatrainbowbutt.png";
+let birdSprites = [];
+
+// Load bird sprite data
+fetch('bird_sprites.json')
+  .then(response => response.json())
+  .then(data => {
+    birdSprites = data.birdSprites;
+    console.log(birdSprites); // Array of bird sprites
+    loadBirdSpriteImages(); // Function to load images after fetching the data
+  })
+  .catch(error => console.error('Error loading the bird sprites:', error));
+
+// Function to load bird images into memory
+function loadBirdSpriteImages() {
+  birdSprites.forEach(bird => {
+    const img = new Image();
+    img.src = bird.path; // Set the source to the path from JSON
+    bird.image = img; // Add the image object to the bird sprite
+  });
+}
+
 
 fetch('colors.json')
   .then(response => response.json())
@@ -70,13 +91,15 @@ const birdSize = 40;
 function initBird() {
     birdY = canvas.height / 2; // Mid-air position
     birdVelocity = 0; // Reset velocity
+    const randomIndex = Math.floor(Math.random() * 9);
+    selectedBirdSprite = birdSprites[randomIndex];
 }
 
 
 // Draw bird with external image
 function drawBird() {
     const birdX = 50; // Fixed X position of the bird
-    ctx.drawImage(birdImg, birdX, birdY, birdSize, birdSize);
+    ctx.drawImage(selectedBirdSprite.image, birdX, birdY, birdSize, birdSize);
 
 }
 
@@ -98,7 +121,10 @@ function drawPipes() {
     const borderThickness = 4;
 
     // Draw top part of the pipe
+    
+    
     ctx.fillStyle = selectedPipeColor; // Use selected color
+    
     ctx.fillRect(
       pipe.x - borderThickness,
       pipe.topPipe - 20,
@@ -119,7 +145,11 @@ function drawPipes() {
     ctx.fillRect(pipe.x - borderThickness, pipe.bottomPipe, pipeWidth + 2 * borderThickness, canvas.height - pipe.bottomPipe);
 
     // Draw the inner pipe
+    if(randomIndex === 9){
+      ctx.fillStyle = "gray"; // Use selected color
+    } else {
     ctx.fillStyle = selectedPipeColor; // Use selected color for inner pipe
+    }
     ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topPipe);
     ctx.fillRect(pipe.x, pipe.bottomPipe, pipeWidth, canvas.height - pipe.bottomPipe);
 }
