@@ -5,13 +5,13 @@ let selectedPipeColor = "#228B22"; // Default pipe color
 
 // Set canvas to full screen size
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// Load background image
+// Load images
 const backgroundImage = new Image();
 backgroundImage.src = 'Flappybirds.png';
 
@@ -42,47 +42,57 @@ function createColorButtons() {
 }
 
 // Game variables
-let birdY = canvas.height / 2;
+let birdY;
 let birdVelocity = 0;
 const gravity = 0.2;
 
-const jump = -8;
+const jump = -4; // Adjust jump height for better control
 
 let score = 0;
 let highScore = 0;
-let level = 1;
 let isGameOver = false;
 let gameStarted = false;
-let pipeSpeed = 2;
+let pipeSpeed = 2; // Initial pipe speed
 
 // Pipe settings
 const pipeWidth = 60;
-const pipeGap = 250;
-const pipeSpacing = 300;
+
+const pipeGap = 250;  // Gap between top and bottom pipes
+const pipeSpacing = 300;  // Space between pipes
+
 const pipes = [];
 
 // Bird settings
 const birdSize = 40;
-let ceilingHitCooldown = 0;
+
+
+// Initialize bird position
+function initBird() {
+    birdY = canvas.height / 2; // Mid-air position
+    birdVelocity = 0; // Reset velocity
+}
+
 
 // Draw bird with external image
 function drawBird() {
-  const birdX = 50;
-  ctx.drawImage(birdImg, birdX, birdY, birdSize, birdSize);
+    const birdX = 50; // Fixed X position of the bird
+    ctx.drawImage(birdImg, birdX, birdY, birdSize, birdSize);
+
 }
 
 // Generate pipes
 function createPipe() {
-  const pipeHeight = Math.floor(Math.random() * (canvas.height - pipeGap));
-  pipes.push({
-    x: canvas.width,
-    topPipe: pipeHeight,
-    bottomPipe: pipeHeight + pipeGap
-  });
+    const pipeHeight = Math.floor(Math.random() * (canvas.height - pipeGap - 100) + 50); // Added range
+    pipes.push({
+        x: canvas.width,
+        topPipe: pipeHeight,
+        bottomPipe: pipeHeight + pipeGap
+    });
 }
 
 // Draw pipes with border and top part
 function drawPipes() {
+
   pipes.forEach(pipe => {
     // Set pipe border thickness
     const borderThickness = 4;
@@ -118,109 +128,137 @@ function drawPipes() {
 
 // Update pipes
 function updatePipes() {
-  if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - pipeSpacing) {
-    createPipe();
-  }
-
-  pipes.forEach(pipe => {
-    pipe.x -= pipeSpeed;
-
-    // Check for collision
-    if (
-      50 < pipe.x + pipeWidth &&
-      50 + birdSize > pipe.x &&
-      (birdY < pipe.topPipe || birdY + birdSize > pipe.bottomPipe)
-    ) {
-      isGameOver = true;
+    if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - pipeSpacing) {
+        createPipe();
     }
 
-    // Score update
-    if (pipe.x + pipeWidth < 50 && !pipe.scored) {
-      score++;
-      pipe.scored = true;
+    pipes.forEach(pipe => {
+        pipe.x -= pipeSpeed;
 
-      // Increase speed and level
-      if (score % 10 === 0) {
-        level++;
-        pipeSpeed += 0.5;
-      }
+        // Check for collision
+        if (
+            50 < pipe.x + pipeWidth &&
+            50 + birdSize > pipe.x &&
+            (birdY < pipe.topPipe || birdY + birdSize > pipe.bottomPipe)
+        ) {
+            isGameOver = true;
+        }
 
-      // Update high score
-      if (score > highScore) {
-        highScore = score;
-      }
+        // Score update
+        if (pipe.x + pipeWidth < 50 && !pipe.scored) {
+            score++;
+            pipe.scored = true;
+
+            // Increase speed every 10 points
+            if (score % 10 === 0) {
+                pipeSpeed += 0.1; // Increase speed slightly with every 10 points
+            }
+
+            // Update high score
+            if (score > highScore) {
+                highScore = score;
+            }
+        }
+    });
+
+    // Remove off-screen pipes
+    if (pipes.length && pipes[0].x < -pipeWidth) {
+        pipes.shift();
     }
-  });
-
-  // Remove off-screen pipes
-  if (pipes.length && pipes[0].x < -pipeWidth) {
-    pipes.shift();
-  }
 }
 
 // Game mechanics
 function updateGame() {
-  if (!gameStarted || isGameOver) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-  if (ceilingHitCooldown > 0) {
-    ceilingHitCooldown--;
-  } else {
+    // Draw background image
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+    // Apply gravity and update bird position
     birdVelocity += gravity;
     birdY += birdVelocity;
-  }
 
-  // Prevent bird from going off the canvas
-  if (birdY > canvas.height - birdSize) {
-    isGameOver = true;
-  } else if (birdY < 0) {
-    birdY = 0;
-    birdVelocity = 0;
-    ceilingHitCooldown = 20;
-  }
+    // Prevent bird from going off the canvas
+    if (birdY > canvas.height - birdSize) {
+        isGameOver = true;  // Game over if bird touches the bottom
+    } else if (birdY < 0) {
+        birdY = 0;               // Stop the bird at the top
+        birdVelocity = 0;        // Reset upward velocity
+    }
 
-  drawBird();
-  drawPipes();
-  updatePipes();
+    drawBird();
+    drawPipes();
+    updatePipes();
 
-  // Draw the score on the canvas
-  ctx.fillStyle = "black";
-  ctx.font = "24px Arial";
-  ctx.fillText("Score: " + score, 20, 30);
-  ctx.fillText("High Score: " + highScore, 20, 60);
+    // Draw the score on the canvas
+    ctx.fillStyle = "black"; // Color for the score text
+    ctx.font = "24px Arial"; // Font style and size
+    ctx.fillText("Score: " + score, 20, 30); // Positioning score text
+    ctx.fillText("High Score: " + highScore, 20, 60); // Positioning high score text
 
-  if (!isGameOver) {
-    requestAnimationFrame(updateGame);
-  } else {
-    alert("Game Over! Your score: " + score);
-    resetGame();
-  }
+    if (!isGameOver) {
+        requestAnimationFrame(updateGame);
+    } else {
+        showDeathScreen();
+    }
+}
+
+// Show death screen
+function showDeathScreen() {
+    document.getElementById("death-screen").style.display = "flex";
+    document.getElementById("gameCanvas").style.display = "none";
+    document.getElementById("final-score").innerText = score; // Display final score
+
 }
 
 // Reset game
 function resetGame() {
-  birdY = canvas.height / 2;
-  birdVelocity = 0;
-  score = 0;
-  level = 1;
-  pipes.length = 0;
-  isGameOver = false;
-  gameStarted = false;
-  pipeSpeed = 2;
+    initBird(); // Initialize bird position
+    score = 0;
+    pipes.length = 0;
+    isGameOver = false;
+    gameStarted = false;
+    pipeSpeed = 2; // Reset pipe speed to normal
 
-  ceilingHitCooldown = 0;
-  document.getElementById("score").textContent = score;
+    // Hide death screen and show game canvas
+    document.getElementById("death-screen").style.display = "none";
+    document.getElementById("gameCanvas").style.display = "block";
+
+
+    // Hide start screen and show game canvas
+    document.getElementById("start-screen").style.display = "none";
+
+    updateGame(); // Start the game loop
 }
 
-// Start game on space bar press
+// Start game on play button press
+document.getElementById("play-button").addEventListener("click", () => {
+    document.getElementById("start-screen").style.display = "none";
+    gameStarted = true;
+    initBird(); // Initialize bird position before starting the game
+    updateGame();
+});
+
+// Restart game on button press
+document.getElementById("restart-button").addEventListener("click", resetGame);
+
+// Go back to homepage
+document.getElementById("home-button").addEventListener("click", () => {
+    location.reload(); // Reload the page to go back to the homepage
+});
+
+// Control the bird with spacebar
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") {
-    if (!gameStarted) {
-      gameStarted = true;
-      updateGame();
+    if (e.code === "Space") {
+        if (gameStarted) {
+            birdVelocity = jump; // Jump only if game is started
+        } else {
+            // Start the game if it's not started yet
+            document.getElementById("start-screen").style.display = "none";
+            gameStarted = true;
+            initBird(); // Initialize bird position
+            updateGame();
+        }
     }
-    birdVelocity = jump;
-  }
 });

@@ -1,18 +1,35 @@
-<!DOCTYPE html>
+=<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flappy Bird Game</title>
-  <link rel="stylesheet" href="styles.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Game</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="menu">
     <h3>Select Pipe Color</h3>
     <div id="colorButtons"></div>
 </div>
-  <canvas id="gameCanvas"></canvas>
-  
-  <script src="script.js"></script>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+        <h1>Welcome to Flappy Bird!</h1>
+        <p>Tap the space bar to navigate through the pipes!</p>
+        <button id="play-button">Play</button>
+    </div>
+
+    <!-- Death Screen -->
+    <div id="death-screen">
+        <h2>Game Over!</h2>
+        <p>Your score: <span id="final-score">0</span></p>
+        <button id="restart-button">Restart</button>
+        <button id="home-button">Go to Homepage</button>
+    </div>
+
+    <script src="script.js"></script>
+
 </body>
 </html>
