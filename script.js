@@ -1,4 +1,4 @@
-const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("gameCanvas"); 
 const ctx = canvas.getContext("2d");
 
 // Set canvas to full screen size
@@ -13,11 +13,16 @@ window.addEventListener("resize", resizeCanvas);
 const backgroundImage = new Image();
 backgroundImage.src = 'Flappybirds.png';
 
+const birdImg = new Image();
+birdImg.src = "birb.png"; // Replace "bird.png" with the path to your bird image
+
 // Game variables
 let birdY = canvas.height / 2;
 let birdVelocity = 0;
 const gravity = 0.2;
+
 const jump = -8;
+
 let score = 0;
 let level = 1;
 let isGameOver = false;
@@ -34,10 +39,10 @@ const pipes = [];
 const birdSize = 20;
 let ceilingHitCooldown = 0;  // Counter for staying on the ceiling
 
-// Draw bird
+// Draw bird with external image
 function drawBird() {
-  ctx.fillStyle = "yellow";
-  ctx.fillRect(50, birdY, birdSize, birdSize);
+  const birdX = 50; // Fixed X position of the bird
+  ctx.drawImage(birdImg, birdX, birdY, birdSize, birdSize);
 }
 
 // Generate pipes
@@ -97,10 +102,11 @@ function updatePipes() {
   }
 }
 
-// Draw golden Marion at level 999
+// Draw Golden Marion at level 999
 function drawGoldenMarion() {
+  const marionX = canvas.width - 60;
   ctx.fillStyle = "gold";
-  ctx.fillRect(canvas.width - 60, birdY, birdSize + 10, birdSize + 10);
+  ctx.fillRect(marionX, birdY, birdSize + 10, birdSize + 10);
 }
 
 // Game mechanics
