@@ -1,4 +1,4 @@
-const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("gameCanvas"); 
 const ctx = canvas.getContext("2d");
 
 // Set canvas to full screen size
@@ -13,11 +13,14 @@ window.addEventListener("resize", resizeCanvas);
 const backgroundImage = new Image();
 backgroundImage.src = 'Flappybirds.png'; // Replace with the path to your background image
 
+const birdImg = new Image();
+birdImg.src = "birb.png"; // Replace "bird.png" with the path to your bird image
+
 // Game variables
 let birdY = canvas.height / 2;
 let birdVelocity = 0;
-const gravity = 0.5;
-const jump = -8;
+const gravity = 0.2;
+const jump = -5;
 let score = 0;
 let highScore = 0;
 let level = 1;
@@ -33,10 +36,10 @@ const pipes = [];
 // Bird settings
 const birdSize = 20;
 
-// Draw bird
+// Draw bird with external image
 function drawBird() {
-  ctx.fillStyle = "yellow";
-  ctx.fillRect(50, birdY, birdSize, birdSize);
+  const birdX = 50; // Fixed X position of the bird
+  ctx.drawImage(birdImg, birdX, birdY, birdSize, birdSize);
 }
 
 // Generate pipes
