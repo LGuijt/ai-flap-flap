@@ -1,5 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+let colors = [];
+let selectedPipeColor = "#228B22"; // Default pipe color
 
 // Set canvas to full screen size
 function resizeCanvas() {
@@ -11,10 +13,33 @@ window.addEventListener("resize", resizeCanvas);
 
 // Load images
 const backgroundImage = new Image();
-backgroundImage.src = 'Flappybirds.png'; // Replace with the path to your background image
+backgroundImage.src = 'Flappybirds.png';
 
 const birdImg = new Image();
-birdImg.src = "nyancatrainbowbutt.png"; // Replace "bird.png" with the path to your bird image
+birdImg.src = "nyancatrainbowbutt.png";
+
+fetch('colors.json')
+  .then(response => response.json())
+  .then(data => {
+    colors = data.colors;
+    console.log(colors); // Array of colors
+    createColorButtons(); // Call to create color buttons
+  })
+  .catch(error => console.error('Error loading the colors:', error));
+
+// Function to create color buttons
+function createColorButtons() {
+  const colorButtonsContainer = document.getElementById("colorButtons");
+  colors.forEach(color => {
+    const button = document.createElement("button");
+    button.style.backgroundColor = color.hex; // Set button color
+    button.textContent = color.name;
+    button.onclick = () => {
+      selectedPipeColor = color.hex; // Set selected color
+    };
+    colorButtonsContainer.appendChild(button);
+  });
+}
 
 // Game variables
 let birdY;
@@ -31,12 +56,15 @@ let pipeSpeed = 2; // Initial pipe speed
 
 // Pipe settings
 const pipeWidth = 60;
+
 const pipeGap = 250;  // Gap between top and bottom pipes
 const pipeSpacing = 300;  // Space between pipes
+
 const pipes = [];
 
 // Bird settings
 const birdSize = 40;
+
 
 // Initialize bird position
 function initBird() {
@@ -49,6 +77,7 @@ function initBird() {
 function drawBird() {
     const birdX = 50; // Fixed X position of the bird
     ctx.drawImage(birdImg, birdX, birdY, birdSize, birdSize);
+
 }
 
 // Generate pipes
@@ -61,26 +90,20 @@ function createPipe() {
     });
 }
 
-
-  // Draw pipes with border and top part
+// Draw pipes with border and top part
 function drawPipes() {
 
   pipes.forEach(pipe => {
-    // Pipe colors
-    const pipeBodyColor = "#228B22"; // Forest green
-    const pipeTopColor = "#006400"; // Darker green for the top
-    const borderColor = "#003300"; // Darker green for the border
-
     // Set pipe border thickness
     const borderThickness = 4;
 
     // Draw top part of the pipe
-    ctx.fillStyle = pipeTopColor;
+    ctx.fillStyle = selectedPipeColor; // Use selected color
     ctx.fillRect(
-      pipe.x - borderThickness,   // Extend slightly for border effect
-      pipe.topPipe - 20,          // Give top pipe cap height
-      pipeWidth + 2 * borderThickness,  // Add width for border
-      20                          // Height of the top part
+      pipe.x - borderThickness,
+      pipe.topPipe - 20,
+      pipeWidth + 2 * borderThickness,
+      20
     );
 
     ctx.fillRect(
@@ -91,17 +114,17 @@ function drawPipes() {
     );
 
     // Draw pipe body with border
-    ctx.fillStyle = borderColor; // Border color for pipe
+    ctx.fillStyle = "#003300"; // Border color for pipe
     ctx.fillRect(pipe.x - borderThickness, 0, pipeWidth + 2 * borderThickness, pipe.topPipe);
     ctx.fillRect(pipe.x - borderThickness, pipe.bottomPipe, pipeWidth + 2 * borderThickness, canvas.height - pipe.bottomPipe);
 
     // Draw the inner pipe
-    ctx.fillStyle = pipeBodyColor;
+    ctx.fillStyle = selectedPipeColor; // Use selected color for inner pipe
     ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topPipe);
     ctx.fillRect(pipe.x, pipe.bottomPipe, pipeWidth, canvas.height - pipe.bottomPipe);
-  });
 }
-
+  )
+}
 
 // Update pipes
 function updatePipes() {
@@ -148,6 +171,7 @@ function updatePipes() {
 function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+
     // Draw background image
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
@@ -168,7 +192,7 @@ function updateGame() {
     updatePipes();
 
     // Draw the score on the canvas
-    ctx.fillStyle = "#FF8C00"; // Color for the score text
+    ctx.fillStyle = "black"; // Color for the score text
     ctx.font = "24px Arial"; // Font style and size
     ctx.fillText("Score: " + score, 20, 30); // Positioning score text
     ctx.fillText("High Score: " + highScore, 20, 60); // Positioning high score text
@@ -185,6 +209,7 @@ function showDeathScreen() {
     document.getElementById("death-screen").style.display = "flex";
     document.getElementById("gameCanvas").style.display = "none";
     document.getElementById("final-score").innerText = score; // Display final score
+
 }
 
 // Reset game
