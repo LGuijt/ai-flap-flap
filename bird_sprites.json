@@ -1,0 +1,41 @@
+{
+    "birdSprites": [
+      {
+        "name": "bird",
+        "path": "birb.png"
+      },
+      {
+        "name": "dog",
+        "path": "doggo.png"
+      },
+      {
+        "name": "cat",
+        "path": "nyancatrainbowbutt.png"
+      },
+      {
+        "name": "koala",
+        "path": "koala.png"
+      },
+      {
+        "name": "donaldduck",
+        "path": "donaldduck.png"
+      },
+      {
+        "name": "notdonaldduck",
+        "path": "trump.png"
+      },
+      {
+        "name": "sans",
+        "path": "sans.png"
+      },
+      {
+        "name": "maxv",
+        "path": "maxv.png"
+      },
+      {
+        "name": "plane",
+        "path": "plane.png"
+      }
+    ]
+  }
+  
