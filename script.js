@@ -16,6 +16,7 @@ const backgroundImage = new Image();
 backgroundImage.src = 'Flappybirds.png';
 
 const birdImg = new Image();
+
 birdImg.src = "nyancatrainbowbutt.png";
 
 fetch('colors.json')
@@ -41,12 +42,14 @@ function createColorButtons() {
   });
 }
 
+
 // Game variables
 let birdY;
 let birdVelocity = 0;
 const gravity = 0.2;
 
-const jump = -4; // Adjust jump height for better control
+const jump = -8;
+
 
 let score = 0;
 let highScore = 0;
@@ -63,6 +66,7 @@ const pipeSpacing = 300;  // Space between pipes
 const pipes = [];
 
 // Bird settings
+
 const birdSize = 40;
 
 
@@ -72,6 +76,17 @@ function initBird() {
     birdVelocity = 0; // Reset velocity
 }
 
+
+
+// Background music
+const backgroundMusic = new Audio('background.mp3'); // Update with the path to your downloaded audio file
+backgroundMusic.loop = true; // Loop the music continuously
+backgroundMusic.volume = 0.5; // Adjust volume (0.0 to 1.0)
+
+// Play the audio when the game starts
+function startBackgroundMusic() {
+  backgroundMusic.play();
+}
 
 // Draw bird with external image
 function drawBird() {
@@ -89,6 +104,7 @@ function createPipe() {
         bottomPipe: pipeHeight + pipeGap
     });
 }
+
 
 // Draw pipes with border and top part
 function drawPipes() {
@@ -120,11 +136,14 @@ function drawPipes() {
 
     // Draw the inner pipe
     ctx.fillStyle = selectedPipeColor; // Use selected color for inner pipe
+
     ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topPipe);
     ctx.fillRect(pipe.x, pipe.bottomPipe, pipeWidth, canvas.height - pipe.bottomPipe);
 }
+
   )
 }
+
 
 // Update pipes
 function updatePipes() {
@@ -250,6 +269,7 @@ document.getElementById("home-button").addEventListener("click", () => {
 
 // Control the bird with spacebar
 document.addEventListener("keydown", (e) => {
+
     if (e.code === "Space") {
         if (gameStarted) {
             birdVelocity = jump; // Jump only if game is started
@@ -257,8 +277,10 @@ document.addEventListener("keydown", (e) => {
             // Start the game if it's not started yet
             document.getElementById("start-screen").style.display = "none";
             gameStarted = true;
+          startBackgroundMusic(); // Start background music
             initBird(); // Initialize bird position
             updateGame();
         }
+
     }
 });
