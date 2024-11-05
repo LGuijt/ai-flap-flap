@@ -11,7 +11,7 @@ window.addEventListener("resize", resizeCanvas);
 
 // Load background image
 const backgroundImage = new Image();
-backgroundImage.src = 'Flappybirds.png';
+backgroundImage.src = 'Flappybirds.png'; // Replace with the path to your background image
 
 const birdImg = new Image();
 birdImg.src = "birb.png"; // Replace "bird.png" with the path to your bird image
@@ -22,6 +22,7 @@ let birdVelocity = 0;
 const gravity = 0.2;
 const jump = -5;
 let score = 0;
+let highScore = 0;
 let level = 1;
 let isGameOver = false;
 let gameStarted = false;
@@ -81,13 +82,17 @@ function updatePipes() {
     // Score update
     if (pipe.x + pipeWidth < 50 && !pipe.scored) {
       score++;
-      document.getElementById("score").textContent = score;
       pipe.scored = true;
 
       // Increase speed and level
       if (score % 10 === 0) {
         level++;
-        pipeSpeed += 0.5;  // Increase speed with each level
+        pipeSpeed += 0.5;
+      }
+
+      // Update high score
+      if (score > highScore) {
+        highScore = score;
       }
     }
   });
@@ -96,13 +101,6 @@ function updatePipes() {
   if (pipes.length && pipes[0].x < -pipeWidth) {
     pipes.shift();
   }
-}
-
-// Draw Golden Marion at level 999
-function drawGoldenMarion() {
-  const marionX = canvas.width - 60;
-  ctx.fillStyle = "gold";
-  ctx.fillRect(marionX, birdY, birdSize + 10, birdSize + 10);
 }
 
 // Game mechanics
@@ -127,18 +125,11 @@ function updateGame() {
   drawPipes();
   updatePipes();
 
-  // Check if level 999 reached
-  if (level === 999) {
-    drawGoldenMarion();
-
-    // Golden Marion collision detection
-    if (
-      birdY < canvas.height / 2 + birdSize + 5 &&
-      birdY + birdSize > canvas.height / 2 - birdSize - 5
-    ) {
-      isGameOver = true;
-    }
-  }
+  // Draw the score on the canvas
+  ctx.fillStyle = "#FF8C00"; // Color for the score text
+  ctx.font = "24px Arial"; // Font style and size
+  ctx.fillText("Score: " + score, 20, 30); // Positioning score text
+  ctx.fillText("High Score: " + highScore, 20, 60); // Positioning high score text
 
   if (!isGameOver) {
     requestAnimationFrame(updateGame);
@@ -158,7 +149,6 @@ function resetGame() {
   isGameOver = false;
   gameStarted = false;
   pipeSpeed = 2;
-  document.getElementById("score").textContent = score;
 }
 
 // Start game on space bar press
