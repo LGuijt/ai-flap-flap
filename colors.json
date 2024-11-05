@@ -1,0 +1,37 @@
+{
+    "colors": [
+      {
+        "name": "Green",
+        "hex": "#228B22"
+      },
+      {
+        "name": "Red",
+        "hex": "#B22222"
+      },
+      {
+        "name": "Gold",
+        "hex": "#DAA520"
+      },
+      {
+        "name": "Blue",
+        "hex": "#1E90FF"
+      },
+      {
+        "name": "Purple",
+        "hex": "#C71585"
+      },
+      {
+        "name": "Orange",
+        "hex": "#FFA500"
+      },
+      {
+        "name": "Gray",
+        "hex": "#708090"
+      },
+      {
+        "name": "Pink",
+        "hex": "#FF69B4"
+      }
+    ]
+  }
+  
