@@ -14,13 +14,12 @@ const backgroundImage = new Image();
 backgroundImage.src = 'Flappybirds.png'; // Replace with the path to your background image
 
 const birdImg = new Image();
-birdImg.src = "nyancatrainbowbutt.png"; // Replace "bird.png" with the path to your bird image
+birdImg.src = "birb.png"; // Replace "bird.png" with the path to your bird image
 
 // Game variables
 let birdY = canvas.height / 2;
 let birdVelocity = 0;
 const gravity = 0.2;
-
 const jump = -8;
 
 let score = 0;
@@ -37,8 +36,18 @@ const pipeSpacing = 300;  // Space between pipes
 const pipes = [];
 
 // Bird settings
-const birdSize = 40;
+const birdSize = 20;
 let ceilingHitCooldown = 0;  // Counter for staying on the ceiling
+
+// Background music
+const backgroundMusic = new Audio('background.mp3'); // Update with the path to your downloaded audio file
+backgroundMusic.loop = true; // Loop the music continuously
+backgroundMusic.volume = 0.5; // Adjust volume (0.0 to 1.0)
+
+// Play the audio when the game starts
+function startBackgroundMusic() {
+  backgroundMusic.play();
+}
 
 // Draw bird with external image
 function drawBird() {
@@ -56,46 +65,14 @@ function createPipe() {
   });
 }
 
-
-  // Draw pipes with border and top part
+// Draw pipes
 function drawPipes() {
+  ctx.fillStyle = "green";
   pipes.forEach(pipe => {
-    // Pipe colors
-    const pipeBodyColor = "#228B22"; // Forest green
-    const pipeTopColor = "#006400"; // Darker green for the top
-    const borderColor = "#003300"; // Darker green for the border
-
-    // Set pipe border thickness
-    const borderThickness = 4;
-
-    // Draw top part of the pipe
-    ctx.fillStyle = pipeTopColor;
-    ctx.fillRect(
-      pipe.x - borderThickness,   // Extend slightly for border effect
-      pipe.topPipe - 20,          // Give top pipe cap height
-      pipeWidth + 2 * borderThickness,  // Add width for border
-      20                          // Height of the top part
-    );
-
-    ctx.fillRect(
-      pipe.x - borderThickness,
-      pipe.bottomPipe,
-      pipeWidth + 2 * borderThickness,
-      20
-    );
-
-    // Draw pipe body with border
-    ctx.fillStyle = borderColor; // Border color for pipe
-    ctx.fillRect(pipe.x - borderThickness, 0, pipeWidth + 2 * borderThickness, pipe.topPipe);
-    ctx.fillRect(pipe.x - borderThickness, pipe.bottomPipe, pipeWidth + 2 * borderThickness, canvas.height - pipe.bottomPipe);
-
-    // Draw the inner pipe
-    ctx.fillStyle = pipeBodyColor;
     ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topPipe);
     ctx.fillRect(pipe.x, pipe.bottomPipe, pipeWidth, canvas.height - pipe.bottomPipe);
   });
 }
-
 
 // Update pipes
 function updatePipes() {
@@ -203,6 +180,7 @@ document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     if (!gameStarted) {
       gameStarted = true;
+      startBackgroundMusic(); // Start background music
       updateGame();
     }
     birdVelocity = jump;
